@@ -1,11 +1,10 @@
 use std::path::Path;
 
-use fs_extra::dir::{CopyOptions, copy};
 use log::{debug, error, info, warn};
 
 use crate::{
     arguments::args::Args,
-    command::run_command::run_command,
+    command::{copy::copy_ignoring, run_command::run_command},
     config::config::{CommandInfo, Config, ProfileInfo},
 };
 
@@ -26,10 +25,6 @@ pub fn build_addon(args: Args) {
         .as_ref()
         .map(|p| Path::new(p).join(format!("{}_RP", config.addon_name)));
 
-    let mut options = CopyOptions::new();
-    options.overwrite = true;
-    options.copy_inside = true;
-
     let profile: Option<&ProfileInfo> = match &args.profile {
         Some(name) => Some(config.get_profile(name).unwrap_or_else(|| {
             error!("Profile {} not found!", name);
@@ -42,20 +37,23 @@ pub fn build_addon(args: Args) {
 
     info!("Copying files...");
 
+    let ignored: Vec<String> = profile
+        .and_then(|p| p.ignored_files.clone())
+        .unwrap_or_default();
+
     match &bp_dest {
         Some(dest) => {
-            copy(&src_bp, dest, &options).unwrap();
+            copy_ignoring(&src_bp, dest, &ignored).unwrap();
         }
         None => warn!("bp_path not configured, skipping BP copy"),
     }
 
     match &rp_dest {
         Some(dest) => {
-            copy(&src_rp, dest, &options).unwrap();
+            copy_ignoring(&src_rp, dest, &ignored).unwrap();
         }
         None => warn!("rp_path not configured, skipping RP copy"),
     }
-
     run_hooks(profile.and_then(|p| p.after_build.as_ref()));
 
     info!("Done");

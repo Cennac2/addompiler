@@ -26,6 +26,7 @@ pub struct Profiles {
 pub struct ProfileInfo {
     pub before_build: Option<Vec<CommandInfo>>,
     pub after_build: Option<Vec<CommandInfo>>,
+    pub ignored_files: Option<Vec<String>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -118,6 +119,7 @@ impl Default for Config {
                 after_build: Some(vec![CommandInfo {
                     command: String::from("echo built"),
                 }]),
+                ignored_files: Some(vec![String::from("src/BP/node_modules")]),
             },
         );
 
