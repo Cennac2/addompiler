@@ -2,9 +2,9 @@ use clap::{Parser, ValueEnum};
 
 #[derive(ValueEnum, Clone, Debug)]
 pub enum ArgTypes {
-    #[value(name = "init")]
     Init,
     Build,
+    Watch,
 }
 
 #[derive(Parser)]

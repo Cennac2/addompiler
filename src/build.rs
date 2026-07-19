@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use log::{debug, error, info, warn};
+use log::{debug, error, warn};
 
 use crate::{
     arguments::args::Args,
@@ -8,8 +8,12 @@ use crate::{
     config::config::{CommandInfo, Config, ProfileInfo},
 };
 
-pub fn build_addon(args: Args) {
-    let config = Config::get_config(&args.directory);
+pub fn build_addon(args: &Args, config: Option<&Config>) {
+    let config = if config.is_some() {
+        config.unwrap()
+    } else {
+        &Config::get_config(&args.directory)
+    };
 
     let src_bp = Path::new(&args.directory).join("src/BP");
     let src_rp = Path::new(&args.directory).join("src/RP");
@@ -35,7 +39,7 @@ pub fn build_addon(args: Args) {
 
     run_hooks(profile.and_then(|p| p.before_build.as_ref()));
 
-    info!("Copying files...");
+    debug!("Copying files...");
 
     let ignored: Vec<String> = profile
         .and_then(|p| p.ignored_files.clone())
@@ -56,7 +60,7 @@ pub fn build_addon(args: Args) {
     }
     run_hooks(profile.and_then(|p| p.after_build.as_ref()));
 
-    info!("Done");
+    debug!("Done");
 }
 
 fn run_hooks(commands: Option<&Vec<CommandInfo>>) {
