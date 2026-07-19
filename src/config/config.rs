@@ -12,8 +12,8 @@ pub struct Config {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AddonPaths {
-    pub bp_path: String,
-    pub rp_path: String,
+    pub bp_path: Option<String>,
+    pub rp_path: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -124,8 +124,8 @@ impl Default for Config {
         Config {
             addon_name: String::from("Addon Name"),
             paths: AddonPaths {
-                bp_path: String::from("path"),
-                rp_path: String::from("path"),
+                bp_path: Some(String::from("path")),
+                rp_path: Some(String::from("path")),
             },
             profiles: Profiles { profiles },
         }

@@ -1,12 +1,12 @@
 use std::path::Path;
 
 use fs_extra::dir::{CopyOptions, copy};
-use log::{debug, error, info};
+use log::{debug, error, info, warn};
 
 use crate::{
     arguments::args::Args,
     command::run_command::run_command,
-    config::config::{Config, ProfileInfo},
+    config::config::{CommandInfo, Config, ProfileInfo},
 };
 
 pub fn build_addon(args: Args) {
@@ -14,8 +14,17 @@ pub fn build_addon(args: Args) {
 
     let src_bp = Path::new(&args.directory).join("src/BP");
     let src_rp = Path::new(&args.directory).join("src/RP");
-    let bp_dest = Path::new(&config.paths.bp_path).join(format!("{}_BP", config.addon_name));
-    let rp_dest = Path::new(&config.paths.rp_path).join(format!("{}_RP", config.addon_name));
+
+    let bp_dest = config
+        .paths
+        .bp_path
+        .as_ref()
+        .map(|p| Path::new(p).join(format!("{}_BP", config.addon_name)));
+    let rp_dest = config
+        .paths
+        .rp_path
+        .as_ref()
+        .map(|p| Path::new(p).join(format!("{}_RP", config.addon_name)));
 
     let mut options = CopyOptions::new();
     options.overwrite = true;
@@ -29,42 +38,43 @@ pub fn build_addon(args: Args) {
         None => None,
     };
 
-    if let Some(before_build) = profile.and_then(|p| p.before_build.as_ref()) {
-        for cmd in before_build {
-            match run_command(&cmd.command) {
-                Ok(status) if status.success() => {
-                    debug!("Command succeeded: {}", cmd.command);
-                }
-                Ok(status) => {
-                    error!("Command failed ({}): {}", status, cmd.command);
-                }
-                Err(e) => {
-                    error!("Failed to run '{}': {}", cmd.command, e);
-                }
-            }
-        }
-    }
+    run_hooks(profile.and_then(|p| p.before_build.as_ref()));
 
     info!("Copying files...");
 
-    copy(&src_bp, &bp_dest, &options).unwrap();
-    copy(&src_rp, &rp_dest, &options).unwrap();
+    match &bp_dest {
+        Some(dest) => {
+            copy(&src_bp, dest, &options).unwrap();
+        }
+        None => warn!("bp_path not configured, skipping BP copy"),
+    }
 
-    if let Some(before_build) = profile.and_then(|p| p.after_build.as_ref()) {
-        for cmd in before_build {
-            match run_command(&cmd.command) {
-                Ok(status) if status.success() => {
-                    debug!("Command succeeded: {}", cmd.command);
-                }
-                Ok(status) => {
-                    error!("Command failed ({}): {}", status, cmd.command);
-                }
-                Err(e) => {
-                    error!("Failed to run '{}': {}", cmd.command, e);
-                }
+    match &rp_dest {
+        Some(dest) => {
+            copy(&src_rp, dest, &options).unwrap();
+        }
+        None => warn!("rp_path not configured, skipping RP copy"),
+    }
+
+    run_hooks(profile.and_then(|p| p.after_build.as_ref()));
+
+    info!("Done");
+}
+
+fn run_hooks(commands: Option<&Vec<CommandInfo>>) {
+    let Some(commands) = commands else { return };
+
+    for cmd in commands {
+        match run_command(&cmd.command) {
+            Ok(status) if status.success() => {
+                debug!("Command succeeded: {}", cmd.command);
+            }
+            Ok(status) => {
+                error!("Command failed ({}): {}", status, cmd.command);
+            }
+            Err(e) => {
+                error!("Failed to run '{}': {}", cmd.command, e);
             }
         }
     }
-
-    info!("Done");
 }
