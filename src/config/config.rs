@@ -1,7 +1,14 @@
-use std::{fs, path::Path};
+use std::{collections::HashMap, fs, path::Path};
 
 use log::{debug, error};
 use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Config {
+    pub addon_name: String,
+    pub paths: AddonPaths,
+    pub profiles: Profiles,
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AddonPaths {
@@ -10,9 +17,20 @@ pub struct AddonPaths {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Config {
-    pub addon_name: String,
-    pub paths: AddonPaths,
+pub struct Profiles {
+    #[serde(flatten)]
+    pub profiles: HashMap<String, ProfileInfo>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ProfileInfo {
+    pub before_build: Option<Vec<CommandInfo>>,
+    pub after_build: Option<Vec<CommandInfo>>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CommandInfo {
+    pub command: String,
 }
 
 const CONFIG_PATH: &str = "addompiler_config.json";
@@ -77,16 +95,39 @@ impl Config {
             }
         }
     }
+
+    // probably not needed at the moment, so leaving it here for later
+    // pub fn get_profiles(&self) -> &HashMap<String, ProfileInfo> {
+    //     &self.profiles.profiles
+    // }
+
+    pub fn get_profile(&self, name: &str) -> Option<&ProfileInfo> {
+        self.profiles.profiles.get(name)
+    }
 }
 
 impl Default for Config {
     fn default() -> Self {
+        let mut profiles = HashMap::new();
+        profiles.insert(
+            String::from("default"),
+            ProfileInfo {
+                before_build: Some(vec![CommandInfo {
+                    command: String::from("echo building"),
+                }]),
+                after_build: Some(vec![CommandInfo {
+                    command: String::from("echo built"),
+                }]),
+            },
+        );
+
         Config {
             addon_name: String::from("Addon Name"),
             paths: AddonPaths {
                 bp_path: String::from("path"),
                 rp_path: String::from("path"),
             },
+            profiles: Profiles { profiles },
         }
     }
 }

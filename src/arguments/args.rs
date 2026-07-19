@@ -14,6 +14,8 @@ pub struct Args {
     pub directory: String,
     #[arg(long, default_value_t = false)]
     pub debug: bool,
+    #[arg(long, short)]
+    pub profile: Option<String>,
 }
 
 pub fn parse_args() -> Args {
