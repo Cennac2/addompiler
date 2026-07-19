@@ -114,12 +114,12 @@ impl Default for Config {
             String::from("default"),
             ProfileInfo {
                 before_build: Some(vec![CommandInfo {
-                    command: String::from("echo building"),
+                    command: String::from("echo Building addon."),
                 }]),
                 after_build: Some(vec![CommandInfo {
-                    command: String::from("echo built"),
+                    command: String::from("echo Addon built!"),
                 }]),
-                ignored_files: Some(vec![String::from("src/BP/node_modules")]),
+                ignored_files: Some(vec![String::from("node_modules")]),
             },
         );
 
