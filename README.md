@@ -131,6 +131,5 @@ If no `-p`/`--profile` is passed, the build runs with no profiles and no ignored
 This project is licensed under the [MIT License](LICENSE).
 
 
-## License
 
-<!-- e.g. MIT, Apache-2.0 — add your license here -->
+yes i used ai for this readme
