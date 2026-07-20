@@ -1,0 +1,15 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "My Behavior Pack",
+    "description": "My Behavior Pack Description",
+    "uuid": "UUID",
+    "version": "1.0.0",
+    "min_engine_version": "1.26.0"
+  },
+  "modules": [{ "type": "data", "uuid": "UUID", "version": "1.0.0" }],
+  "metadata": {
+    "product_type": "addon",
+    "generated_with": { "addompiler": ["1.0.0"] }
+  }
+}
