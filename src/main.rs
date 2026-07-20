@@ -13,7 +13,7 @@ mod build;
 mod command;
 mod config;
 mod initialize;
-mod templates;
+mod templates_manager;
 mod watch;
 
 fn main() {

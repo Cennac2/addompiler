@@ -3,7 +3,7 @@ use std::path::Path;
 use log::{debug, error};
 
 use crate::{
-    arguments::args::Args, config::config::Config, templates::templates::extract_template,
+    arguments::args::Args, config::config::Config, templates_manager::templates::extract_template,
 };
 
 pub fn initialize_addompiler(args: Args) {
