@@ -11,7 +11,7 @@ use crate::config::config::Config;
 pub fn watch_addon(args: Args) -> notify::Result<()> {
     let (tx, rx) = mpsc::channel();
 
-    let mut debouncer = new_debouncer(Duration::from_millis(300), tx)?;
+    let mut debouncer = new_debouncer(Duration::from_secs(1), tx)?;
 
     let config = Config::get_config(&args.directory);
 
