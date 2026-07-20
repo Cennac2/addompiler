@@ -1,4 +1,5 @@
 use log::error;
+use std::io::Write;
 
 use crate::{
     arguments::args::{ArgTypes, parse_args},
@@ -12,12 +13,11 @@ mod build;
 mod command;
 mod config;
 mod initialize;
+mod templates;
 mod watch;
 
 fn main() {
     let args = parse_args();
-
-    use std::io::Write;
 
     env_logger::Builder::new()
         .filter_level(if args.debug {

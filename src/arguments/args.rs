@@ -19,6 +19,9 @@ pub struct Args {
     /// Profile to use when building
     #[arg(long, short)]
     pub profile: Option<String>,
+    /// Template you want to use for initalize
+    #[arg(long, short, default_value_t = String::from("default"), value_parser = [ "default", "script-addon", "addon" ], hide_default_value = true)]
+    pub template: String,
     /// Print debug logs
     #[arg(long, default_value_t = false)]
     pub debug: bool,
