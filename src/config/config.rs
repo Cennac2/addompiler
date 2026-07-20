@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     pub addon_name: String,
-    pub paths: AddonPaths,
     pub profiles: Profiles,
 }
 
@@ -24,9 +23,11 @@ pub struct Profiles {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ProfileInfo {
+    pub paths: Option<AddonPaths>,
     pub before_build: Option<Vec<CommandInfo>>,
     pub after_build: Option<Vec<CommandInfo>>,
     pub ignored_files: Option<Vec<String>>,
+    pub ignored_watch_files: Option<Vec<String>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -113,6 +114,10 @@ impl Default for Config {
         profiles.insert(
             String::from("default"),
             ProfileInfo {
+                paths: Some(AddonPaths {
+                    bp_path: Some(String::from("path")),
+                    rp_path: Some(String::from("path")),
+                }),
                 before_build: Some(vec![CommandInfo {
                     command: String::from("echo Building addon."),
                 }]),
@@ -120,15 +125,12 @@ impl Default for Config {
                     command: String::from("echo Addon built!"),
                 }]),
                 ignored_files: Some(vec![String::from("node_modules")]),
+                ignored_watch_files: Some(vec![String::from("src/BP/scripts")]),
             },
         );
 
         Config {
             addon_name: String::from("Addon Name"),
-            paths: AddonPaths {
-                bp_path: Some(String::from("path")),
-                rp_path: Some(String::from("path")),
-            },
             profiles: Profiles { profiles },
         }
     }

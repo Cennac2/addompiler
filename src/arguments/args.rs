@@ -17,8 +17,8 @@ pub struct Args {
     #[arg(long, short, default_value_t = String::from("./"), hide_default_value = true)]
     pub directory: String,
     /// Profile to use when building
-    #[arg(long, short)]
-    pub profile: Option<String>,
+    #[arg(long, short, default_value_t = String::from("default"))]
+    pub profile: String,
     /// Template you want to use for initalize
     #[arg(long, short, default_value_t = String::from("default_template"), value_parser = [ "default_template", "script-addon", "addon" ], hide_default_value = true)]
     pub template: String,
